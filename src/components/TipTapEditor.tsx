@@ -6,7 +6,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import Document from '@tiptap/extension-document'
 
 import React, {useEffect} from "react";
-import {Placeholder} from "@tiptap/extension-placeholder";
+
 
 import './tipTapEditor.scss';
 import {Button} from "@/components/ui/button";
