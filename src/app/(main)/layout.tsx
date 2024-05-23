@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {useRouter} from "next/navigation";
 import {AuthContext} from "@/lib/AuthProvider";
-import Loading from "@/app/(main)/dashboard/Loading";
+import Loading from "@/app/(main)/dashboard/loading";
+import {ModeToggle} from "@/components/ModeToggle";
 
 function MainLayout({children}: { children: ReactNode }) {
     const router = useRouter()
@@ -249,6 +250,7 @@ function MainLayout({children}: { children: ReactNode }) {
                             <DropdownMenuItem>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <ModeToggle />
                 </header>
                 <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
                     {children}

@@ -4,7 +4,9 @@ import {toast} from "react-toastify";
 import {createUserWithEmailAndPassword, signInWithEmailAndPassword, User} from "firebase/auth";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import db, {auth} from "@/lib/firebase/config";
-import {addDoc, collection, getDocs, query, where} from "@firebase/firestore";
+import {addDoc, collection, doc, getDoc, getDocs, query, where,Timestamp} from "@firebase/firestore";
+
+
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -22,6 +24,25 @@ export const successMessage = (message: string) => {
         theme: "dark",
     });
 };
+
+
+export function getBorderColor(mood:string) {
+    console.log(mood)
+    switch (mood.toLowerCase()) {
+        case "excited":
+            return "border-yellow-500";
+        case "happy":
+            return "border-green-500";
+        case "neutral":
+            return "border-gray-500";
+        case "sad":
+            return "border-blue-500";
+        case "angry":
+            return "border-red-500";
+        default:
+            return "border-gray-500"; // Default border color
+    }
+}
 export const errorMessage = (message: string) => {
     toast.error(message, {
         position: "top-right",
@@ -40,7 +61,7 @@ export const LoginUser = (email: string, password: string, router: AppRouterInst
         .then((userCredential) => {
             const user = userCredential.user;
             successMessage("Authentication successful 🎉");
-            router.push("/mylog");
+            router.push("/dashboard");
         })
         .catch((error) => {
             console.error(error);
@@ -53,7 +74,7 @@ export const RegisterUser = (email: string, password: string, router: AppRouterI
         .then((userCredential) => {
             const user = userCredential.user;
             successMessage("Authentication successful 🎉");
-            router.push("/mylog");
+            router.push("/dashboard");
         })
         .catch((error) => {
             console.error(error);
@@ -62,11 +83,12 @@ export const RegisterUser = (email: string, password: string, router: AppRouterI
 };
 
 
-export const addJournal = async (title: string, content: string, user: User) => {
+export const addJournal = async (title: string, content: string,mood:string, user: User) => {
     await addDoc(collection(db, "journal_entries"), {
         user_id: user.uid,
         title,
         content,
+        mood,
         created_at: new Date(),
     })
 }
@@ -85,3 +107,30 @@ export const getJournalEntries = async (user: User) => {
         return [];
     }
 }
+
+export const getJournalEntry = async (userId: string, docId: string) => {
+
+    try {
+        // Create a reference to the specific document
+        const docRef = doc(db, 'journal_entries', docId);
+        // Get the document
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            // Document data exists
+            const data = docSnap.data();
+            // Convert Firestore Timestamp to JavaScript Date
+            if (data.created_at instanceof Timestamp) {
+                data.created_at = data.created_at.toDate();
+            }
+            return { id: docSnap.id, ...docSnap.data() };
+        } else {
+            // Document does not exist
+            console.error('No such document!');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting document:', error);
+        return null;
+    }
+};
