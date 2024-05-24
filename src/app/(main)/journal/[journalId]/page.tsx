@@ -1,16 +1,18 @@
 "use client"
 
-import {getJournalEntry} from '@/lib/utils';
+import {deleteJournal, getJournalEntry} from '@/lib/utils';
 import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "@/lib/AuthProvider";
 import {User} from "firebase/auth";
-import entry from "next/dist/server/typescript/rules/entry";
 import DOMPurify from "dompurify";
 import moment from "moment";
 import {Timestamp} from "@firebase/firestore";
-import {Calendar} from "lucide-react";
+import {Calendar, Pen, Trash} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
 
 const JournalPage = ({params}: { params: { journalId: string } }) => {
+
     const {user} = useContext(AuthContext)
     const [journalEntry, setJournalEntry] = useState<{
         id: string,
@@ -23,12 +25,12 @@ const JournalPage = ({params}: { params: { journalId: string } }) => {
         user_id: null,
         content: "",
         title: "",
-        created_at: new Timestamp(10,10)
+        created_at: new Timestamp(10, 10)
     });
 
 
     const [loading, setLoading] = useState(true);
-
+    const router = useRouter();
     useEffect(() => {
 
         const fetchJournalEntry = async () => {
@@ -44,26 +46,41 @@ const JournalPage = ({params}: { params: { journalId: string } }) => {
 
         fetchJournalEntry();
     }, [user]);
+
     return (
         <main className={"mb-5"}>
-           <section className={"header text-justify mx-auto w-8/12"}>
-               <h1 className={"text-lg font-bold"}>
-                   {journalEntry.title}
-               </h1>
-               <p>
-                   {journalEntry.user_id?.displayName}
-               </p>
-               <div className={"border-t mt-5 py-3 "}>
-                    <h1 className={"flex items-center text-neutral-500 font-medium text-sm"}>
-                        <Calendar className={"mr-2 w-4 h-4"}/>{moment(journalEntry.created_at.toDate().toISOString()).format("MMMM Do YYYY")}
+            <section className={"header text-justify mx-auto w-8/12"}>
+                <div className={"flex items-center justify-between"}>
+                    <h1 className={"text-lg font-bold"}>
+                        {journalEntry?.title}
                     </h1>
-               </div>
-               <section>
-                   {
-                       <p className="max-w-lg text-neutral-500 mt-2.5" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(journalEntry.content) }} />
-                   }
-               </section>
-           </section>
+                    <div className={"space-x-2"}>
+                        <Button variant={"outline"} onClick={() => {
+                            router.push("/journal/" + journalEntry.id + "/edit")
+                        }}>
+                            <Pen className={"w-4 h-4"}/>
+                        </Button>
+                        <Button variant={"destructive_outline"} onClick={async () => {
+                            await deleteJournal(journalEntry.id)
+                            router.push('/journal')
+                        }}>
+                            <Trash className={"w-4 h-4"}/>
+                        </Button>
+                    </div>
+                </div>
+                <div className={"border-t mt-5 py-3 "}>
+                    <h1 className={"flex items-center text-neutral-500 font-medium text-sm"}>
+                        <Calendar
+                            className={"mr-2 w-4 h-4"}/>{moment(journalEntry.created_at.toDate().toISOString()).format("MMMM Do YYYY")}
+                    </h1>
+                </div>
+                <section>
+                    {
+                        <p className="max-w-lg text-neutral-500 mt-2.5"
+                           dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(journalEntry.content)}}/>
+                    }
+                </section>
+            </section>
 
         </main>
     );

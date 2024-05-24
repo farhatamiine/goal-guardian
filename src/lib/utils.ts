@@ -4,8 +4,18 @@ import {toast} from "react-toastify";
 import {createUserWithEmailAndPassword, signInWithEmailAndPassword, User} from "firebase/auth";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import db, {auth} from "@/lib/firebase/config";
-import {addDoc, collection, doc, getDoc, getDocs, query, where,Timestamp} from "@firebase/firestore";
-
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    Timestamp,
+    updateDoc,
+    where
+} from "@firebase/firestore";
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -92,6 +102,32 @@ export const addJournal = async (title: string, content: string,mood:string, use
         created_at: new Date(),
     })
 }
+
+export const editJournal = async (journalId: string, title: string, content: string, mood: string, user: User) => {
+    try {
+        const journalDocRef = doc(db, "journal_entries", journalId);
+        await updateDoc(journalDocRef, {
+            title,
+            content,
+            mood,
+            updated_at: new Date(),  // Optionally track when the document was updated
+        });
+    } catch (error) {
+        console.error("Error updating journal entry: ", error);
+        throw new Error("Error updating journal entry");
+    }
+};
+
+
+export const deleteJournal = async (journalId: string) => {
+    try {
+        const journalDocRef = doc(db, "journal_entries", journalId);
+        await deleteDoc(journalDocRef);
+    } catch (error) {
+        console.error("Error deleting journal entry: ", error);
+        throw new Error("Error deleting journal entry");
+    }
+};
 
 export const getJournalEntries = async (user: User) => {
     try {

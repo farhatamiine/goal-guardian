@@ -7,6 +7,7 @@ import DOMPurify from "dompurify";
 import {Timestamp} from "@firebase/firestore";
 import moment from "moment";
 import {cn} from "@/lib/utils";
+import {useRouter} from "next/navigation";
 
 function JournalCard({
                          id,
@@ -44,11 +45,14 @@ function JournalCard({
         }
     };
 
-
+    const router = useRouter();
 
     return (
         <Card
             key={id}
+            onClick={() => {
+                router.push("/journal/" + id)
+            }}
             className={cn(
                 `cursor-pointer ease-in-out hover:${getColorByMood(mood)}  border-b-2`,
                 className
