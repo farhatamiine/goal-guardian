@@ -45,7 +45,7 @@ const JournalPage = ({params}: { params: { journalId: string } }) => {
         };
 
         fetchJournalEntry();
-    }, [user]);
+    }, [params.journalId, user]);
 
     return (
         <main className={"mb-5"}>

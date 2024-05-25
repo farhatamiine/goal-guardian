@@ -137,7 +137,7 @@ const JournalPage = ({params}: { params: { journalId: string } }) => {
                             name="mood"
                             render={({field: {onChange, value}}) => (
                                 <FormItem className={"flex-grow"}>
-                                    <FormLabel>How's your mood today?</FormLabel>
+                                    <FormLabel>How`&apos;`s your mood today?</FormLabel>
                                     <FormControl>
                                         <div className={"space-x-3"}>
                                             {

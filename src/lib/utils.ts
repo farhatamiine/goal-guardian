@@ -16,6 +16,7 @@ import {
     updateDoc,
     where
 } from "@firebase/firestore";
+import {openai} from "@/lib/openAiConfig";
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -36,7 +37,7 @@ export const successMessage = (message: string) => {
 };
 
 
-export function getBorderColor(mood:string) {
+export function getBorderColor(mood: string) {
     console.log(mood)
     switch (mood.toLowerCase()) {
         case "excited":
@@ -53,6 +54,7 @@ export function getBorderColor(mood:string) {
             return "border-gray-500"; // Default border color
     }
 }
+
 export const errorMessage = (message: string) => {
     toast.error(message, {
         position: "top-right",
@@ -93,7 +95,7 @@ export const RegisterUser = (email: string, password: string, router: AppRouterI
 };
 
 
-export const addJournal = async (title: string, content: string,mood:string, user: User) => {
+export const addJournal = async (title: string, content: string, mood: string, user: User) => {
     await addDoc(collection(db, "journal_entries"), {
         user_id: user.uid,
         title,
@@ -159,7 +161,7 @@ export const getJournalEntry = async (userId: string, docId: string) => {
             if (data.created_at instanceof Timestamp) {
                 data.created_at = data.created_at.toDate();
             }
-            return { id: docSnap.id, ...docSnap.data() };
+            return {id: docSnap.id, ...docSnap.data()};
         } else {
             // Document does not exist
             console.error('No such document!');
@@ -168,5 +170,31 @@ export const getJournalEntry = async (userId: string, docId: string) => {
     } catch (error) {
         console.error('Error getting document:', error);
         return null;
+    }
+};
+
+export const openaiCheckGrammar = async (content: string) => {
+    try {
+        return await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    "role": "system",
+                    "content": "You will be provided with statements, and your task is to correct the grammar of the journal and convert them to standard English and make them fancier."
+                },
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 64,
+            top_p: 1,
+        });
+
+
+    } catch (error) {
+        console.error("Error calling OpenAI API:", error);
+        throw new Error("Error calling OpenAI API");
     }
 };

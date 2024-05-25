@@ -10,8 +10,9 @@ import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Input} from "@/components/ui/input";
-import {addJournal, errorMessage, successMessage} from "@/lib/utils";
+import {addJournal, errorMessage, openaiCheckGrammar, successMessage} from "@/lib/utils";
 import {AuthContext} from "@/lib/AuthProvider";
+import {PencilLine} from "lucide-react";
 
 const editorFormSchema = z.object({
     title: z.string().min(2, {
@@ -68,6 +69,18 @@ function NewJournalPage() {
         },
     })
 
+    const handleGrammarCheck = async () => {
+        const content = form.getValues('content');
+        try {
+            const response = await openaiCheckGrammar(content);
+            console.log(response)// Replace with actual OpenAI API call // Update the content with the corrected text
+            successMessage('Grammar checked and updated successfully');
+        } catch (error) {
+            console.error('Error checking grammar:', error);
+            errorMessage('Error checking grammar');
+        }
+    };
+
     return (
         <div>
             <div className="flex items-center mb-3">
@@ -100,7 +113,7 @@ function NewJournalPage() {
                             name="mood"
                             render={({field: {onChange, value}}) => (
                                 <FormItem className={"flex-grow"}>
-                                    <FormLabel>How's your mood today?</FormLabel>
+                                    <FormLabel>How`&apos;`s your mood today?</FormLabel>
                                     <FormControl>
                                         <div className={"space-x-3"}>
                                             {
@@ -125,7 +138,13 @@ function NewJournalPage() {
                             name="content"
                             render={({field:{onChange,value}}) => (
                                 <FormItem className={"flex-grow"}>
-                                    <FormLabel>Content</FormLabel>
+                                    <div className={"flex justify-between items-center"}>
+                                        <FormLabel>Content</FormLabel>
+                                        <Button type="button" variant={"ghost"} onClick={handleGrammarCheck}>
+                                            <PencilLine className={"mr-2 w-4 h-4"}/>
+                                            Check Grammar
+                                        </Button>
+                                    </div>
                                     <FormControl>
                                         <TipTapEditor content={value} handleContentChange={onChange}/>
                                     </FormControl>
