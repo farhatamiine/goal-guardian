@@ -1,10 +1,10 @@
 "use client"
 
-import React, {ReactNode, useContext, useEffect} from 'react';
+import React from 'react';
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 
-function DashboardPage({children}: { children: ReactNode }) {
+const DashboardPage = () => {
     return (
         <main>
             <div className="flex items-center">
@@ -36,4 +36,4 @@ function DashboardPage({children}: { children: ReactNode }) {
     );
 }
 
-export default DashboardPage;
+export default DashboardPage
