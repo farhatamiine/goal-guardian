@@ -4,14 +4,13 @@ import {onAuthStateChanged} from "firebase/auth";
 import {useCallback, useState} from "react";
 import {auth} from "@/lib/firebase/config";
 import {useRouter} from "next/navigation";
-import {User} from "@/lib/types";
 
 export default function MyLogPage() {
 
     const router = useRouter()
-    const [user, setUser] = useState<User>();
+    //const [user, setUser] = useState<User>();
 
-    const isUserLoggedIn = useCallback(() => {
+   /*  const isUserLoggedIn = useCallback(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUser({email: user.email, uid: user.uid});
@@ -20,7 +19,7 @@ export default function MyLogPage() {
                 return router.push("/");
             }
         });
-    }, [router]);
+    }, [router]); */
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
